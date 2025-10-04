@@ -12,6 +12,9 @@ import menusRoutes from './routes/menus.routes';
 import ordersRoutes from './routes/orders.routes';
 import errorMiddleware from './middlewares/error.middleware';
 import { initJobs } from './jobs/queue';
+import paymentRoutes from './routes/payments.routes';
+import webhookRoutes from './routes/webhooks.routes';
+
 
 // initialize DB connection
 connectDB(); // yahan mongo se connect karega
@@ -25,6 +28,7 @@ app.use(compression());
 
 // logging
 app.use(morgan('dev'));
+app.use('/api/webhooks', webhookRoutes); 
 
 // body parsers
 app.use(json());
@@ -38,6 +42,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/menus', menusRoutes);
 app.use('/api/orders', ordersRoutes);
+app.use('/api/payments', paymentRoutes);
+
+
 
 // stripe webhook placeholder - raw body required at runtime; route added in orders.controller if needed
 

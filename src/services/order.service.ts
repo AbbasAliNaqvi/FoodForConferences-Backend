@@ -1,39 +1,59 @@
-import mongoose from 'mongoose';
 import OrderModel, { OrderDocument } from '../models/Order';
 import MenuModel from '../models/Menu';
 import logger from '../utils/logger';
-import config from '../config';
 
 const createOrder = async (payload: any): Promise<OrderDocument> => {
-  // Try to use session / transaction if available (replica set)
-  const session = await mongoose.startSession();
-  session.startTransaction();
   try {
-    // Check inventory for each line item, decrement sold if available
+    if (!Array.isArray(payload.items) || payload.items.length === 0) {
+      throw new Error('Order must contain at least one item');
+    }
+
+    let total = 0;
+
     for (const it of payload.items) {
-      const menu = await MenuModel.findOne({ 'items._id': it.itemId }).session(session);
+      // Ensure qty is provided
+      const qty = Number(it.qty ?? 0);
+      if (isNaN(qty) || qty <= 0) {
+        throw new Error(`Invalid quantity for item ${it.itemId}`);
+      }
+      it.qty = qty;
+
+      // Find the menu item
+      const menu = await MenuModel.findOne({ 'items._id': it.itemId });
       if (!menu) throw new Error('Menu item not found');
+
       const menuItem = menu.items.id(it.itemId);
       if (!menuItem) throw new Error('Menu item not found');
-      const total = (menuItem.inventory?.total ?? Infinity) - (menuItem.inventory?.sold ?? 0);
-      if (typeof total === 'number' && total < it.qty) throw new Error(`Insufficient inventory for ${menuItem.name}`);
-      // decrement sold
-      if (menuItem.inventory && typeof menuItem.inventory.sold === 'number') {
-        menuItem.inventory.sold = (menuItem.inventory.sold || 0) + it.qty;
-        await menu.save({ session });
+
+      // Auto-fill price and name from menu
+      it.price = Number(menuItem.price ?? 0);
+      it.name = menuItem.name ?? '';
+
+      // Calculate total
+      total += it.price * it.qty;
+
+      // Check inventory
+      const available = (menuItem.inventory?.total ?? Infinity) - (menuItem.inventory?.sold ?? 0);
+      if (available < qty) throw new Error(`Insufficient inventory for ${menuItem.name}`);
+
+      // Update sold safely
+      if (menuItem.inventory) {
+        const currentSold = Number(menuItem.inventory.sold ?? 0);
+        menuItem.inventory.sold = currentSold + qty;
+        await menu.save();
       }
     }
 
-    const order = new OrderModel(payload);
-    await order.save({ session });
+    // Set total in payload
+    payload.total = total;
 
-    await session.commitTransaction();
-    session.endSession();
+    // Save the order
+    const order = new OrderModel(payload);
+    await order.save();
+
     return order;
   } catch (err) {
-    await session.abortTransaction();
-    session.endSession();
-    logger.error('createOrder transaction failed', err as Error);
+    logger.error('Create order error', err as Error);
     throw err;
   }
 };
