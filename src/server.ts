@@ -6,6 +6,8 @@ import logger from './utils/logger';
 
 const PORT = config.port;
 
+console.log(config.port); 
+
 const server = http.createServer(app);
 
 // Initialize Socket.IO on the same server
