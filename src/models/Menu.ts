@@ -10,6 +10,7 @@ export interface MenuItem {
   imageUrl?: string;
   inventory?: { total?: number; sold?: number };
   prepTimeMinutes?: number;
+  vendorId: string;
 }
 
 export interface MenuDocument extends Document {

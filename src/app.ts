@@ -14,13 +14,17 @@ import errorMiddleware from './middlewares/error.middleware';
 import { initJobs } from './jobs/queue';
 import paymentRoutes from './routes/payments.routes';
 import webhookRoutes from './routes/webhooks.routes';
-
+import eventExtendRoutes from './routes/events.extend.routes';
+import vendorsRoutes from './routes/vendors.routes';
+import menuExtendRoutes from './routes/menus.extend.routes';
+import orderExtendRoutes from './routes/orders.extend.routes';
+import analyticsRoutes from './routes/analytics.routes';
 
 // initialize DB connection
 connectDB(); // yahan mongo se connect karega
 
 const app = express();
-
+app.disable('etag');
 // security middlewares
 app.use(helmet());
 app.use(cors({ origin: true, credentials: true }));
@@ -43,10 +47,11 @@ app.use('/api/events', eventsRoutes);
 app.use('/api/menus', menusRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/payments', paymentRoutes);
-
-
-
-// stripe webhook placeholder - raw body required at runtime; route added in orders.controller if needed
+app.use('/api/events', eventExtendRoutes);
+app.use('/api/menus', menuExtendRoutes);
+app.use('/api/orders', orderExtendRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/vendors', vendorsRoutes);
 
 // global error handler
 app.use(errorMiddleware);

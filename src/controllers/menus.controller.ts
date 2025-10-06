@@ -21,7 +21,20 @@ export const createMenu = async (req: Request, res: Response, next: NextFunction
 export const getMenusByEvent = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const menus = await Menu.find({ eventId: req.params.eventId });
-    res.json(menus);
+    const menusWithVendorId = menus.map(menu => {
+      const menuObject = menu.toObject(); 
+      const itemsWithVendorId = menuObject.items.map((item: any) => ({
+        ...item,
+        vendorId: menuObject.vendorId.toString(), 
+        eventId: menuObject.eventId.toString(),
+      }));
+      return {
+        ...menuObject,
+        items: itemsWithVendorId,
+      };
+    });
+
+    res.json(menusWithVendorId);
   } catch (err) {
     logger.error('Get menus error', err as Error);
     next(err);

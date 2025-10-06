@@ -8,7 +8,7 @@ const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
   mongoUri: process.env.MONGO_URI || 'mongodb://localhost:27017/Intern',
   jwtSecret: process.env.JWT_SECRET || 'JWT_SECRET',
-  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '4h',
+  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '544h',
   refreshTokenExpiresIn: process.env.REFRESH_EXPIRES_IN || '7d',
   stripeSecret: process.env.STRIPE_SECRET || 'STRIPE_SECRET',
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || 'STRIPE_WEBHOOK_SECRET',
