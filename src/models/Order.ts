@@ -39,7 +39,7 @@ const OrderSchema = new Schema<OrderDocument>(
     attendeeId: { type: Schema.Types.ObjectId, ref: 'User' },
     items: [OrderItemSchema],
     total: { type: Number, default: 0 },
-    currency: { type: String, default: 'USD' },
+    currency: { type: String, default: 'INR' },
     paymentStatus: { type: String, enum: ['pending','paid','failed'], default: 'pending' },
     orderStatus: { type: String, enum: ['queued','preparing','ready','picked','completed','cancelled'], default: 'queued' },
     slotId: String,

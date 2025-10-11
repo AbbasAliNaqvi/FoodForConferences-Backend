@@ -8,7 +8,7 @@ const stripe = new Stripe(config.stripeSecret || '', { apiVersion: '2022-11-15' 
 // Create a PaymentIntent
 export const createPaymentIntent = async (
   amount: number, 
-  currency = 'usd', 
+  currency = 'INR', 
   metadata: Record<string, any> = {}
 ) => {
   try {

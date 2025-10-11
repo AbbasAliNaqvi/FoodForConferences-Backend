@@ -28,7 +28,7 @@ const MenuItemSchema = new Schema<MenuItem>({
   name: { type: String, required: true },
   description: String,
   price: { type: Number, required: true },
-  currency: { type: String, default: 'USD' },
+  currency: { type: String, default: 'INR' },
   tags: [String],
   allergens: [String],
   imageUrl: String,

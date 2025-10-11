@@ -7,7 +7,7 @@ const createIntent = async (req: Request, res: Response) => {
     const { amount, currency } = req.body;
     if (!amount) return res.status(400).json({ message: 'Amount is required' });
 
-    const paymentIntent = await StripeService.createPaymentIntent(amount, currency || 'usd');
+    const paymentIntent = await StripeService.createPaymentIntent(amount, currency || 'inr');
     res.status(200).json({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
     logger.error('Create PaymentIntent error', err as Error);
